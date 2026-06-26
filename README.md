@@ -134,3 +134,99 @@ A: We would create a `MongoDBCourseRepository` class that implements the same `C
 
 This demonstrates the power of interfaces: by using the `CourseRepository` interface type, we can swap implementations without changing the client code that uses them.
 
+---
+
+## Day 3 Exercise 01 - Build and Trace the Code Flow
+
+### Reflection
+
+**Q: When getCourseById("C004") is called, which file does the request go to first, second, and third?**
+
+A: The request flow follows this order:
+1. **First:** `CodeFlowPractice.java` - The demo class calls the method
+2. **Second:** `CourseService.java` - The service receives the request and calls the repository
+3. **Third:** `InMemoryCourseRepository.java` - The repository retrieves the course from the LinkedHashMap
+
+This demonstrates the layered architecture pattern where each layer has a specific responsibility, and the demo class doesn't directly access the repository.
+
+---
+
+## Day 3 Exercise 03 - Exception Practice with CourseService
+
+### Reflection
+
+**Q: Why is throwing CourseNotFoundException better than printing inside CourseService?**
+
+A: Throwing an exception is better because:
+- **Flexibility:** Console app, web API, and frontend app may all display the same error differently
+- **Separation of concerns:** The service should report the error, not decide how to display it
+- **Composability:** Different calling code can handle the same exception in different ways
+- **Testing:** It's easier to test error scenarios when exceptions are thrown
+- **Logging and monitoring:** Exceptions can be logged and monitored more effectively
+- **Code reusability:** If the service printed directly to console, it couldn't be used in a web application or mobile app
+
+---
+
+## Day 3 Exercise 04 - Object Relationships and Composition
+
+### Reflection
+
+**Q: Why is CourseOffering a better design than putting start date, end date, and capacity directly inside Course?**
+
+A: Separating CourseOffering from Course is better because:
+- **Reusability:** A single course can have multiple offerings with different dates, times, and capacities
+- **Flexibility:** Different offerings can be scheduled for different audiences (Beginner/Weekend/Online sessions)
+- **Maintenance:** Changes to offering logic don't affect the core course definition
+- **Real-world mapping:** In the real world, courses and offerings are distinct entities
+- **Single Responsibility:** Course defines what is taught; CourseOffering defines when and how it's delivered
+- **Scalability:** As the business grows, offerings might have additional properties (instructors, venues, etc.) that don't apply to courses
+
+---
+
+## Day 3 Exercise 05 - Loop Search Then Stream Search
+
+### Reflection
+
+**Q: Which version is easier to understand: loop or stream? Why?**
+
+A: The loop version is generally easier to understand for beginners because:
+- It's explicit and imperative: "Do this, then do that"
+- Each step is clearly visible in the code
+- It's similar to how people think about algorithms
+- Debugging is straightforward with breakpoints
+
+The stream version is more powerful for complex scenarios and becomes easier with practice because:
+- It's more concise and expressive
+- It separates "what to do" (filter) from "how to do it" (implementation)
+- It's more functional and declarative in style
+
+**Q: What does filter() do in a stream?**
+
+A: `filter()` takes a predicate (condition) and returns only the elements from the stream that satisfy the condition. For example:
+- `.filter(course -> course.getLevel().equalsIgnoreCase("Beginner"))` - keeps only Beginner courses
+- Elements that don't match the condition are excluded from the result
+
+---
+
+## Day 3 Exercise 06 - Build StudentService Using the Same Pattern as CourseService
+
+### Reflection
+
+**Q: How is StudentService similar to CourseService?**
+
+A: StudentService and CourseService are similar because:
+- Both implement the service layer pattern with repository dependency injection
+- Both have `create/register`, `getById`, `getAll`, and `search` methods
+- Both handle validation and throw appropriate exceptions
+- Both use the same repository-service architecture
+- Both support both loop and stream versions of search methods
+- This demonstrates that the service/repository pattern is a general architectural pattern applicable to many entities
+
+**Q: Which file stores students temporarily while the program is running?**
+
+A: `InMemoryStudentRepository.java` stores students temporarily using a LinkedHashMap:
+- Data exists only in RAM while the application runs
+- All data is lost when the application shuts down
+- This is a placeholder for when we switch to MongoDB later
+- The same pattern applies to courses with InMemoryCourseRepository
+
