@@ -112,23 +112,25 @@ Participants must always review, verify, test, and understand any AI-generated o
 
 ---
 
-## Day 3 Exercise 01 - Code Flow Reflection
+## Day 3 Exercise 02 - Interface and Repository Storage Practice
 
-### Question: When getCourseById("C004") is called, which file does the request go to first, second, and third?
+### Reflection
 
-**Answer:**
+**Q: Why is InMemoryCourseRepository temporary storage?**
 
-1. **First: CodeFlowPractice.java** (Demo class) 
-   - The request originates from the demo class which calls `courseService.getCourseById("C004")`
+A: InMemoryCourseRepository uses a LinkedHashMap to store courses in memory (RAM). This means:
+- Data is only stored while the application is running
+- When the application stops, all data is lost
+- It doesn't persist to a database or file system
+- It's intended as a placeholder for demonstration and testing purposes
 
-2. **Second: CourseService.java** (Service layer)
-   - The service receives the request and processes it. It calls `courseRepository.findById("C004")` which returns an `Optional<Course>`. It then handles the Optional and either returns the Course or throws `CourseNotFoundException`.
+**Q: What would probably replace it later when we use MongoDB?**
 
-3. **Third: InMemoryCourseRepository.java** (Repository layer)
-   - The repository layer receives the request and searches the internal LinkedHashMap to find the course by ID. It returns an `Optional<Course>` back to the service.
+A: We would create a `MongoDBCourseRepository` class that implements the same `CourseRepository` interface. This class would:
+- Connect to a MongoDB database instead of using in-memory storage
+- Store documents in MongoDB collections permanently
+- Provide data persistence across application restarts
+- Use the same interface methods (save, findById, findAll, deleteById, existsById) so that the rest of the application code doesn't need to change
 
-**The flow completes by returning the Course object back through the service to the demo class.**
-
-This layered architecture (Demo → Service → Repository) allows for proper separation of concerns: the demo class deals with presentation, the service handles business logic and validation, and the repository handles data persistence and retrieval.
-
+This demonstrates the power of interfaces: by using the `CourseRepository` interface type, we can swap implementations without changing the client code that uses them.
 
