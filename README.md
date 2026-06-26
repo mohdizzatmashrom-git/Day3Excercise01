@@ -110,3 +110,25 @@ Participants may use AI tools to:
 
 Participants must always review, verify, test, and understand any AI-generated output. No passwords, API keys, tokens, private keys, or confidential data should be placed into AI prompts.
 
+---
+
+## Day 3 Exercise 01 - Code Flow Reflection
+
+### Question: When getCourseById("C004") is called, which file does the request go to first, second, and third?
+
+**Answer:**
+
+1. **First: CodeFlowPractice.java** (Demo class) 
+   - The request originates from the demo class which calls `courseService.getCourseById("C004")`
+
+2. **Second: CourseService.java** (Service layer)
+   - The service receives the request and processes it. It calls `courseRepository.findById("C004")` which returns an `Optional<Course>`. It then handles the Optional and either returns the Course or throws `CourseNotFoundException`.
+
+3. **Third: InMemoryCourseRepository.java** (Repository layer)
+   - The repository layer receives the request and searches the internal LinkedHashMap to find the course by ID. It returns an `Optional<Course>` back to the service.
+
+**The flow completes by returning the Course object back through the service to the demo class.**
+
+This layered architecture (Demo → Service → Repository) allows for proper separation of concerns: the demo class deals with presentation, the service handles business logic and validation, and the repository handles data persistence and retrieval.
+
+
