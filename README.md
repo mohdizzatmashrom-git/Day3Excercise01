@@ -134,3 +134,31 @@ A: We would create a `MongoDBCourseRepository` class that implements the same `C
 
 This demonstrates the power of interfaces: by using the `CourseRepository` interface type, we can swap implementations without changing the client code that uses them.
 
+## Day 3 Exercise 05 - Loop Search vs Stream Search
+
+### Reflection
+
+**Q: Which version is easier to understand: loop or stream? Why?**
+
+A: The **stream version** is generally easier to understand once you are familiar with the Stream API, because:
+
+- **It expresses intent, not steps.** A stream chain like `.filter(...).toList()` reads like a sentence: "filter the courses that match this condition and collect them." A loop requires you to read through the iteration logic, the `if` condition, and the `add()` call to understand the same thing.
+- **Less boilerplate.** With streams, you don't need to create an empty list, write a `for` loop, and manually add matching items. The stream handles the iteration for you.
+- **Easier to chain operations.** If you later need to add sorting, mapping, or limiting, you just append another method call (`.sorted()`, `.map()`, `.limit()`). With loops, each new operation means more nested code.
+
+However, for beginners who have not yet learned the Stream API, the **loop version** can feel more familiar because it uses basic constructs (`for`, `if`, `List.add`) that are taught first.
+
+**Q: What does filter() do in a stream?**
+
+A: `filter()` keeps only the elements that match a given condition (predicate). It takes a lambda expression that returns `true` or `false` for each element. If the lambda returns `true`, the element passes through; if `false`, the element is removed from the stream.
+
+For example:
+
+```java
+courses.stream()
+       .filter(course -> course.getLevel().equalsIgnoreCase("Beginner"))
+       .toList();
+```
+
+This keeps only courses where the level is "Beginner" and discards the rest. It is the stream equivalent of an `if` statement inside a loop.
+
