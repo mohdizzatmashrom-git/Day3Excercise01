@@ -112,6 +112,25 @@ Participants must always review, verify, test, and understand any AI-generated o
 
 ---
 
+## Day 3 Exercise 01 - Build and Trace the Code Flow
+
+### Reflection
+
+**Q: When getCourseById("C004") is called, which file does the request go to first, second, and third?**
+
+A: The request flows through three files in order:
+
+1. **First: `CodeFlowPractice.java` (Demo class)**
+   - The call originates here. The demo class calls `courseService.getCourseById("C004")`.
+
+2. **Second: `CourseService.java` (Service layer)**
+   - The service receives the call and delegates to the repository by calling `courseRepository.findById("C004")`. It then handles the returned `Optional<Course>` — either returning the course or throwing `CourseNotFoundException` if not found.
+
+3. **Third: `InMemoryCourseRepository.java` (Repository layer)**
+   - The repository looks up the course ID in its internal `LinkedHashMap` and returns an `Optional<Course>` back to the service.
+
+The `Course` object is then returned back through the service to the demo class. This layered flow (Demo → Service → Repository) ensures separation of concerns: the demo class handles presentation, the service handles business logic and validation, and the repository handles data storage and retrieval.
+
 ## Day 3 Exercise 02 - Interface and Repository Storage Practice
 
 ### Reflection
@@ -133,4 +152,35 @@ A: We would create a `MongoDBCourseRepository` class that implements the same `C
 - Use the same interface methods (save, findById, findAll, deleteById, existsById) so that the rest of the application code doesn't need to change
 
 This demonstrates the power of interfaces: by using the `CourseRepository` interface type, we can swap implementations without changing the client code that uses them.
+
+## Day 3 Exercise 03 - Exception Practice
+
+### Reflection
+
+**Q: Why is throwing CourseNotFoundException better than printing inside CourseService?**
+
+A: Throwing an exception is better than printing directly inside `CourseService` because it separates *error detection* from *error display*. Different callers may need to handle the same error in different ways:
+
+- **Console app** — might print the error message to the terminal.
+- **Web API** — might return an HTTP 404 JSON response to the client.
+- **Frontend app** — might show a user-friendly alert or toast notification on screen.
+
+If `CourseService` prints the error itself, it forces every caller to use the console output approach. By throwing `CourseNotFoundException` instead, the service simply signals that something went wrong, and each caller decides how to present or handle that error.
+
+This also makes the code more testable (tests can catch and assert on exceptions), more maintainable (error display logic lives in one place per caller), and more flexible (new callers can handle the error differently without changing the service).
+
+## Day 3 Exercise 04 - Object Relationships and Composition
+
+### Reflection
+
+**Q: Why is CourseOffering a better design than putting start date, end date, and capacity directly inside Course?**
+
+A: A `Course` represents *what* is being taught (title, duration, level). A `CourseOffering` represents *when* and *how* it is delivered (start date, end date, capacity, delivery mode).
+
+Keeping them separate is better because:
+
+- **One course can have many offerings.** The same "Java Fundamentals" course can run in June, July, and September, each with different dates, capacities, and instructors. If we put dates and capacity inside `Course`, we would need to duplicate the entire course for each intake.
+- **Single responsibility.** `Course` focuses on curriculum content. `CourseOffering` focuses on scheduling and logistics. Each class has one clear purpose.
+- **Reusability through composition.** `CourseOffering` holds a reference to a `Course` object, so we reuse the same course data without copying it. This is the composition pattern: "a CourseOffering *has a* Course."
+- **Easier to maintain.** If we need to change how scheduling works (e.g., add a location field), we only modify `CourseOffering`. The `Course` class stays untouched.
 
